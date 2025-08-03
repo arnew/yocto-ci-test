@@ -3,6 +3,8 @@ name: yocto CI
 on: [push]
 
 env:
+  DL_DIR: /persist/downloads
+  SSTATE_DIR: /persist/sstate-cache
   BB_GENERATE_MIRROR_TARBALLS: 1
 
 jobs:
@@ -12,8 +14,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with: 
-          clean: false
       - uses: actions/cache@v4
         with:
           path: |
@@ -30,18 +30,6 @@ jobs:
       - name: Add missing locales
         run: sudo apt-get -y install locales && sudo sh -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen" && sudo locale-gen
 
-      - uses: actions/cache@v4
-        with:
-          path: |
-            build/sstate-cache/
-          key: sstate-cache
-          save-always: true
-      - uses: actions/cache@v4
-        with:
-          path: |
-            build/downloads/
-          key: downloads
-          save-always: true
       - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
         name: Prefetch source
         continue-on-error: true
