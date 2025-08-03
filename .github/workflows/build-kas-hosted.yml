@@ -42,3 +42,11 @@ jobs:
           name: images
           path: |
             build/tmp/deploy/images/*/*sdimg
+      - name: Build yocto sdk
+        run: kas build pi-minimal.yml -c populate_sdk
+      - name: Upload image
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdk
+          path: |
+            build/tmp/deploy/sdk/*
