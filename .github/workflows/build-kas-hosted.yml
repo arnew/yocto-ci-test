@@ -1,26 +1,48 @@
-name: PlatformIO CI
+name: yocto CI
 
 on: [push]
 
+env:
+  BB_GENERATE_MIRROR_TARBALLS: 1
+
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    #runs-on: ubuntu-22.04
+    runs-on: self-hosted
 
     steps:
       - uses: actions/checkout@v4
       - uses: actions/cache@v4
         with:
           path: |
-            build/downloads/
-            build/sstate-cache/
-          key: ${{ runner.os }}-pio
+            ~/.cache/pip
+          key: ${{ runner.os }}-pip
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
       - name: Install Kas
         run: pip install --upgrade kas
       - name: Install missing host tools
-        run: sudo apt-get -y install chrpath diffstat
+        run: sudo apt-get -y install chrpath diffstat cpio file gawk lz4 wget zstd
+      - name: Add missing locales
+        run: sudo apt-get -y install locales && sudo sh -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen" && sudo locale-gen
 
+      - uses: actions/cache@v4
+        with:
+          path: |
+            build/sstate-cache/
+          key: sstate-cache
+          save-always: true
+      - uses: actions/cache@v4
+        with:
+          path: |
+            build/downloads/
+          key: downloads
+          save-always: true
+      - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+        name: Prefetch source
+        continue-on-error: true
+        run: kas shell -c "bitbake core-image-base --runall=fetch" pi-minimal.yml
       - name: Build yocto Project
         run: kas build pi-minimal.yml
