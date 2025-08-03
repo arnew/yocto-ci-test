@@ -1,0 +1,26 @@
+name: PlatformIO CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            build/downloads/
+            build/sstate-cache/
+          key: ${{ runner.os }}-pio
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Kas
+        run: pip install --upgrade kas
+      - name: Install missing host tools
+        run: sudo apt-get -y install chrpath diffstat
+
+      - name: Build yocto Project
+        run: kas build pi-minimal.yml
