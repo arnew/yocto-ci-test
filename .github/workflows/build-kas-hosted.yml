@@ -12,6 +12,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with: 
+          clean: false
       - uses: actions/cache@v4
         with:
           path: |
@@ -46,3 +48,9 @@ jobs:
         run: kas shell -c "bitbake core-image-base --runall=fetch" pi-minimal.yml
       - name: Build yocto Project
         run: kas build pi-minimal.yml
+      - name: Upload image
+        uses: actions/upload-artifact@v4
+        with:
+          name: images
+          path: |
+            build/tmp/deploy/images/*/*sdimg
