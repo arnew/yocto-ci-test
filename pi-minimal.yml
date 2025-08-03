@@ -1,0 +1,36 @@
+header:
+    version: 14
+distro: poky
+repos:
+    poky:
+        url: git://git.yoctoproject.org/poky
+        branch: scarthgap
+        layers:
+            meta:
+            meta-poky:
+            meta-yocto-bsp:
+    meta-openembedded:
+        url: git://git.openembedded.org/meta-openembedded
+        branch: scarthgap
+        layers:
+            meta-oe:
+    meta-raspberrypi:
+        url: https://github.com/TheYoctoJester/meta-raspberrypi
+        branch: scarthgap-cm5
+local_conf_header:
+    base: |
+        CONF_VERSION = "2"
+        PACKAGE_CLASSES = "package_ipk"
+        INIT_MANAGER = "systemd"
+    debug-tweaks: |
+        EXTRA_IMAGE_FEATURES = "debug-tweaks"
+    raspberrypi: |
+        ENABLE_UART = "1"
+        LICENSE_FLAGS_ACCEPTED = "synaptics-killswitch"
+        BOOT_SPACE = "1073741"
+        IMAGE_FSTYPES:append = " rpi-sdimg "
+        # SERIAL_CONSOLES:append = " 115200:ttyAMA0 115200:ttyS0 "
+        # RPI_CONFIG:append = " dtoverlay=uart0,txd1_pin=14,rxd1_pin=15 "
+target:
+- core-image-base
+machine: raspberrypi-armv8
