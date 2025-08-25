@@ -3,8 +3,8 @@ name: yocto CI
 on: [push]
 
 env:
-  #DL_DIR: /persist/downloads
-  #SSTATE_DIR: /persist/sstate-cache
+  DL_DIR: /persist/downloads
+  SSTATE_DIR: /persist/sstate-cache
   BB_GENERATE_MIRROR_TARBALLS: 1
 
 jobs:
