@@ -29,7 +29,8 @@ jobs:
         run: sudo apt-get -y install chrpath diffstat cpio file gawk lz4 wget zstd
       - name: Add missing locales
         run: sudo apt-get -y install locales && sudo sh -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen" && sudo locale-gen
-
+      - name: Fix permissions of /persist
+        run: sudo chown -R docker /persist
       - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
         name: Prefetch source
         continue-on-error: true
