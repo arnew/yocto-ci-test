@@ -8,12 +8,13 @@ env:
   SSTATE_DIR: /build/sstate-cache
   BB_GENERATE_MIRROR_TARBALLS: 1
 
-  YOCTO_CACHE_HOST: ${{ vars.YOCTO_CACHE_HOST }}
-  DL_DIR_REMOTE: rsync://${{ vars.YOCTO_CACHE_HOST }}/downloads
-  SSTATE_DIR_REMOTE: rsync://${{ vars.YOCTO_CACHE_HOST }}/sstate-cache
+  # fixed cache host
+  DL_DIR_REMOTE: "rsync://yocto-cache.m.rasentrimmer.org/downloads"
+  SSTATE_DIR_REMOTE: "rsync://yocto-cache.m.rasentrimmer.org/sstate-cache"
   KAS_PREMIRRORS: |
-    http://.* http://${{ vars.YOCTO_CACHE_HOST }}:8080/downloads/
-  SSTATE_MIRRORS: file://.* http://${{ vars.YOCTO_CACHE_HOST }}:8080/sstate-cache/PATH
+    http://.* http://yocto-cache.m.rasentrimmer.org:8080/downloads/
+  SSTATE_MIRRORS: |
+    file://.* http://yocto-cache.m.rasentrimmer.org:8080/sstate-cache/PATH
 
 jobs:
   build:
