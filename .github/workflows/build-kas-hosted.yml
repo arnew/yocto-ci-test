@@ -1,4 +1,4 @@
-name: Yocto CI (tmpfs build)
+name: Yocto CI (tmpfs build, pre-filled)
 
 on: [push]
 
@@ -26,6 +26,13 @@ jobs:
       - name: Install Kas (pip only)
         run: pip install --upgrade kas
 
+      - name: Pre-fill tmpfs from /persist
+        run: |
+          echo "[INFO] Pre-filling /build from /persist..."
+          mkdir -p $DL_DIR $SSTATE_DIR
+          rsync -av --ignore-existing /persist/downloads/ $DL_DIR/
+          rsync -av --ignore-existing /persist/sstate-cache/ $SSTATE_DIR/
+
       - name: Prefetch sources
         continue-on-error: true
         run: kas shell -c "bitbake core-image-base --runall=fetch" pi-minimal.yml
@@ -50,6 +57,7 @@ jobs:
 
       - name: Sync DL_DIR + SSTATE to persist
         run: |
+          echo "[INFO] Syncing tmpfs caches back to /persist..."
           rsync -av --ignore-existing "$DL_DIR/" /persist/downloads/
           rsync -av --ignore-existing "$SSTATE_DIR/" /persist/sstate-cache/
 
