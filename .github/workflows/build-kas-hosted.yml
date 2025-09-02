@@ -1,15 +1,22 @@
-name: yocto CI
+name: Yocto CI
 
 on: [push]
 
 env:
-  DL_DIR: /persist/downloads
-  SSTATE_DIR: /persist/sstate-cache
+  # Local paths on the runner
+  DL_DIR: /tmp/downloads
+  SSTATE_DIR: /tmp/sstate-cache
   BB_GENERATE_MIRROR_TARBALLS: 1
+
+  # Remote cache (served by nginx + rsync)
+  YOCTO_CACHE_HOST: ${{ vars.YOCTO_CACHE_HOST }}
+  DL_DIR_REMOTE: rsync://${{ vars.YOCTO_CACHE_HOST }}/downloads
+  SSTATE_DIR_REMOTE: rsync://${{ vars.YOCTO_CACHE_HOST }}/sstate-cache
+  SOURCE_MIRROR_URL: http://${{ vars.YOCTO_CACHE_HOST }}:8080/downloads/
+  SSTATE_MIRRORS: file://.* http://${{ vars.YOCTO_CACHE_HOST }}:8080/sstate-cache/PATH
 
 jobs:
   build:
-    #runs-on: ubuntu-22.04
     runs-on: self-hosted
 
     steps:
@@ -29,25 +36,35 @@ jobs:
         run: sudo apt-get -y install chrpath diffstat cpio file gawk lz4 wget zstd
       - name: Add missing locales
         run: sudo apt-get -y install locales && sudo sh -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen" && sudo locale-gen
-      - name: Fix permissions of /persist
-        run: sudo chown -R docker /persist
-      - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
-        name: Prefetch source
+      - name: Prefetch sources
         continue-on-error: true
         run: kas shell -c "bitbake core-image-base --runall=fetch" pi-minimal.yml
-      - name: Build yocto Project
+
+      - name: Build Yocto Project
         run: kas build pi-minimal.yml
+
       - name: Upload image
         uses: actions/upload-artifact@v4
         with:
           name: images
-          path: |
-            build/tmp/deploy/images/*/*sdimg
-      - name: Build yocto sdk
+          path: build/tmp/deploy/images/*/*sdimg
+
+      - name: Build Yocto SDK
         run: kas build pi-minimal.yml -c populate_sdk
-      - name: Upload image
+
+      - name: Upload SDK
         uses: actions/upload-artifact@v4
         with:
           name: sdk
-          path: |
-            build/tmp/deploy/sdk/*
+          path: build/tmp/deploy/sdk/*
+
+      - name: Upload downloads to cache
+        run: |
+          echo "[INFO] Uploading DL_DIR to cache..."
+          rsync -av --ignore-existing "$DL_DIR/" "$DL_DIR_REMOTE/"
+
+      - name: Upload sstate-cache to cache
+        run: |
+          echo "[INFO] Uploading SSTATE_DIR to cache..."
+          rsync -av --ignore-existing "$SSTATE_DIR/" "$SSTATE_DIR_REMOTE/"
+
