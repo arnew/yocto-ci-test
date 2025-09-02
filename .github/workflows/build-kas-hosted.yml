@@ -3,7 +3,7 @@ name: Yocto CI (tmpfs build, pre-filled)
 on: [push]
 
 env:
-  BUILDDIR: /build
+  KAS_BUILD_DIR: /build
   DL_DIR: /build/downloads
   SSTATE_DIR: /build/sstate-cache
   BB_GENERATE_MIRROR_TARBALLS: 1
@@ -11,7 +11,8 @@ env:
   YOCTO_CACHE_HOST: ${{ vars.YOCTO_CACHE_HOST }}
   DL_DIR_REMOTE: rsync://${{ vars.YOCTO_CACHE_HOST }}/downloads
   SSTATE_DIR_REMOTE: rsync://${{ vars.YOCTO_CACHE_HOST }}/sstate-cache
-  SOURCE_MIRROR_URL: http://${{ vars.YOCTO_CACHE_HOST }}:8080/downloads/
+  KAS_PREMIRRORS: |
+    http://.* http://${{ vars.YOCTO_CACHE_HOST }}:8080/downloads/
   SSTATE_MIRRORS: file://.* http://${{ vars.YOCTO_CACHE_HOST }}:8080/sstate-cache/PATH
 
 jobs:
