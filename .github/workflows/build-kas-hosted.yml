@@ -1,14 +1,13 @@
-name: Yocto CI
+name: Yocto CI (tmpfs build)
 
 on: [push]
 
 env:
-  # Local paths on the runner
-  DL_DIR: /tmp/downloads
-  SSTATE_DIR: /tmp/sstate-cache
+  BUILDDIR: /build
+  DL_DIR: /build/downloads
+  SSTATE_DIR: /build/sstate-cache
   BB_GENERATE_MIRROR_TARBALLS: 1
 
-  # Remote cache (served by nginx + rsync)
   YOCTO_CACHE_HOST: ${{ vars.YOCTO_CACHE_HOST }}
   DL_DIR_REMOTE: rsync://${{ vars.YOCTO_CACHE_HOST }}/downloads
   SSTATE_DIR_REMOTE: rsync://${{ vars.YOCTO_CACHE_HOST }}/sstate-cache
@@ -18,24 +17,15 @@ env:
 jobs:
   build:
     runs-on: self-hosted
-
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/pip
-          key: ${{ runner.os }}-pip
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install Kas
+      - name: Install Kas (pip only)
         run: pip install --upgrade kas
-      - name: Install missing host tools
-        run: sudo apt-get -y install chrpath diffstat cpio file gawk lz4 wget zstd
-      - name: Add missing locales
-        run: sudo apt-get -y install locales && sudo sh -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen" && sudo locale-gen
+
       - name: Prefetch sources
         continue-on-error: true
         run: kas shell -c "bitbake core-image-base --runall=fetch" pi-minimal.yml
@@ -47,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: images
-          path: build/tmp/deploy/images/*/*sdimg
+          path: ${{ env.BUILDDIR }}/tmp/deploy/images/*/*sdimg
 
       - name: Build Yocto SDK
         run: kas build pi-minimal.yml -c populate_sdk
@@ -56,15 +46,15 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: sdk
-          path: build/tmp/deploy/sdk/*
+          path: ${{ env.BUILDDIR }}/tmp/deploy/sdk/*
 
-      - name: Upload downloads to cache
+      - name: Sync DL_DIR + SSTATE to persist
         run: |
-          echo "[INFO] Uploading DL_DIR to cache..."
-          rsync -av --ignore-existing "$DL_DIR/" "$DL_DIR_REMOTE/"
+          rsync -av --ignore-existing "$DL_DIR/" /persist/downloads/
+          rsync -av --ignore-existing "$SSTATE_DIR/" /persist/sstate-cache/
 
-      - name: Upload sstate-cache to cache
-        run: |
-          echo "[INFO] Uploading SSTATE_DIR to cache..."
-          rsync -av --ignore-existing "$SSTATE_DIR/" "$SSTATE_DIR_REMOTE/"
+      - name: Upload DL_DIR to cache server
+        run: rsync -av --ignore-existing "$DL_DIR/" "$DL_DIR_REMOTE/"
 
+      - name: Upload SSTATE to cache server
+        run: rsync -av --ignore-existing "$SSTATE_DIR/" "$SSTATE_DIR_REMOTE/"
