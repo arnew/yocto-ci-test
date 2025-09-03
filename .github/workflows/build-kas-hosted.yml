@@ -28,13 +28,6 @@ jobs:
       - name: Install Kas (pip only)
         run: pip install --upgrade kas
 
-      - name: Pre-fill tmpfs from /persist
-        run: |
-          echo "[INFO] Pre-filling /build from /persist..."
-          mkdir -p $DL_DIR $SSTATE_DIR
-          rsync -av --ignore-existing /persist/downloads/ $DL_DIR/
-          rsync -av --ignore-existing /persist/sstate-cache/ $SSTATE_DIR/
-
       - name: Prefetch sources
         continue-on-error: true
         run: kas shell -c "bitbake core-image-base --runall=fetch" pi-minimal.yml
