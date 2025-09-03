@@ -3,6 +3,13 @@ name: Yocto CI (tmpfs build, pre-filled)
 on: [push]
 
 env:
+  BB_NO_NETWORK: "0"               # allow network fetch
+  BB_FETCH_DEBUG: "1"              # debug fetcher
+  BB_VERBOSE_LOGS: "1"             # more detailed logs
+  BITBAKE_UI: "knotty"             # standard output UI
+  BBDEBUG: "2"                     # bitbake debug level (0–2 usually useful)
+
+
   KAS_BUILD_DIR: /build
   DL_DIR: /build/downloads
   SSTATE_DIR: /build/sstate-cache
@@ -29,9 +36,11 @@ jobs:
       - name: Install Kas (pip only)
         run: pip install --upgrade kas
 
-      - name: Prefetch sources
+      - name: Prefetch sources (debug)
         continue-on-error: true
-        run: kas shell -c "bitbake core-image-base --runall=fetch" pi-minimal.yml
+        run: |
+          set -x
+          kas shell -c "bitbake -DDD -v core-image-base --runall=fetch" pi-minimal.yml
 
       - name: Build Yocto Project
         run: kas build pi-minimal.yml
