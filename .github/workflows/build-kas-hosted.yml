@@ -12,8 +12,7 @@ env:
   DL_DIR_REMOTE: "rsync://yocto-cache.m.rasentrimmer.org/downloads"
   SSTATE_DIR_REMOTE: "rsync://yocto-cache.m.rasentrimmer.org/sstate-cache"
   KAS_PREMIRRORS: |
-    http://.*/.* http://yocto-cache.m.rasentrimmer.org:8080/downloads/
-    https://.*/.* http://yocto-cache.m.rasentrimmer.org:8080/downloads/
+    https?://.*/.*(tar.gz|tar.bz2|tar.xz|zip) http://yocto-cache.m.rasentrimmer.org:8080/downloads/
     ftp://.*/.* http://yocto-cache.m.rasentrimmer.org:8080/downloads/
   SSTATE_MIRRORS: |
     file://.* http://yocto-cache.m.rasentrimmer.org:8080/sstate-cache/PATH
