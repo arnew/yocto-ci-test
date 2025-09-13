@@ -121,3 +121,16 @@ jobs:
       - name: remove tmp dir
         run: rm -rf $TMPDIR
         if: ${{ always() }} # Run even if previous steps in the job fail or are canceled
+  release:
+    runs-on: self-hosted
+    needs: [build,sdk]
+    steps:
+      - uses: actions/download-artifact@v5
+      - uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
+        with:
+          files: |
+            **/*sdimg
+            **/*sh
+
+
