@@ -3,7 +3,9 @@ header:
     version: 14
 local_conf_header:
     premirrors: |
+      BB_GENERATE_MIRROR_TARBALLS="1"
       PREMIRRORS:prepend = "\
           https?://.*/.*(tar\.gz|tar\.bz2|tar\.xz|zip) http://yocto-cache.m.rasentrimmer.org:8080/downloads/ \
           ftp://.*/.* http://yocto-cache.m.rasentrimmer.org:8080/downloads/ \
           "
+

@@ -12,7 +12,6 @@ env:
   KAS_BUILD_DIR: /build
   DL_DIR: /build/downloads
   SSTATE_DIR: /build/sstate-cache
-  BB_GENERATE_MIRROR_TARBALLS: 1
 
   # fixed cache host
   DL_DIR_REMOTE: "rsync://yocto-cache.m.rasentrimmer.org/downloads"
