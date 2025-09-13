@@ -10,7 +10,8 @@ env:
   #BBDEBUG: "2"                     # bitbake debug level (0–2 usually useful)
 
   #KAS_BUILD_DIR: /build
-  TMPDIR: /build/tmp
+  #TMPDIR: /build/tmp
+  TMPDIR: "/build/tmp-${{ github.run_id }}"
   DL_DIR: /build/downloads
   SSTATE_DIR: /build/sstate-cache
 
