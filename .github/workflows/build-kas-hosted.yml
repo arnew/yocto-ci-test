@@ -1,4 +1,4 @@
-name: Yocto CI (tmpfs build, pre-filled)
+name: Yocto CI
 
 on: [push]
 
