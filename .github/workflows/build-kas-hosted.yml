@@ -32,11 +32,11 @@ jobs:
       - name: Install Kas (pip only)
         run: pip install --upgrade kas
 
-      - name: Prefetch sources (debug)
+      - name: Prefetch sources using premirrors
         continue-on-error: true
         run: |
           set -x
-          kas shell -c "bitbake -DDD -v core-image-base --runall=fetch" pi-minimal.yml:premirrors.yml
+          kas shell -c "bitbake core-image-base --runall=fetch" pi-minimal.yml:premirrors.yml
 
       - name: Build Yocto Project
         run: kas build pi-minimal.yml
