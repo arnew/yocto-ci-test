@@ -20,7 +20,7 @@ env:
     file://.* http://yocto-cache.m.rasentrimmer.org:8080/sstate-cache/PATH
 
 jobs:
-  build:
+  prepare:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
@@ -36,7 +36,12 @@ jobs:
         run: |
           set -x
           kas shell -c "bitbake core-image-base --runall=fetch" pi-minimal.yml:premirrors.yml
+      - name: Upload DL_DIR to cache server
+        run: rsync -av --ignore-existing "$DL_DIR/" "$DL_DIR_REMOTE/"
 
+  build:
+    runs-on: self-hosted
+    steps:
       - name: Build Yocto Project
         run: kas build pi-minimal.yml
 
@@ -54,12 +59,6 @@ jobs:
         with:
           name: sdk
           path: ${{ env.KAS_BUILD_DIR }}/tmp/deploy/sdk/*
-
-      - name: Sync DL_DIR + SSTATE to persist
-        run: |
-          echo "[INFO] Syncing tmpfs caches back to /persist..."
-          rsync -av --ignore-existing "$DL_DIR/" /persist/downloads/
-          rsync -av --ignore-existing "$SSTATE_DIR/" /persist/sstate-cache/
 
       - name: Upload DL_DIR to cache server
         run: rsync -av --ignore-existing "$DL_DIR/" "$DL_DIR_REMOTE/"
