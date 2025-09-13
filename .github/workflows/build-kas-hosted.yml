@@ -122,6 +122,7 @@ jobs:
         run: rm -rf $TMPDIR
         if: ${{ always() }} # Run even if previous steps in the job fail or are canceled
   release:
+    if: github.ref_type == 'tag'
     runs-on: self-hosted
     needs: [build,sdk]
     steps:
@@ -132,5 +133,6 @@ jobs:
           files: |
             **/*sdimg
             **/*sh
+          token: ${{ secrets.RELEASE_TOKEN }}
 
 
