@@ -11,7 +11,7 @@ env:
 
   #KAS_BUILD_DIR: /build
   #TMPDIR: /build/tmp
-  TMPDIR: "/build/tmp-${{ github.run_id }}"
+  TMPDIR: "/build/tmp-${{ github.run_id }}-${{ github.job }}"
   DL_DIR: /build/downloads
   SSTATE_DIR: /build/sstate-cache
 
@@ -46,6 +46,10 @@ jobs:
       - uses: eviden-actions/clean-self-hosted-runner@v1
         if: ${{ always() }} # Run even if previous steps in the job fail or are canceled
 
+      - name: remove tmp dir
+        run: rm -rf $TMPDIR
+        if: ${{ always() }} # Run even if previous steps in the job fail or are canceled
+
   build:
     runs-on: self-hosted
     needs: prepare
@@ -78,6 +82,10 @@ jobs:
       - uses: eviden-actions/clean-self-hosted-runner@v1
         if: ${{ always() }} # Run even if previous steps in the job fail or are canceled
 
+      - name: remove tmp dir
+        run: rm -rf $TMPDIR
+        if: ${{ always() }} # Run even if previous steps in the job fail or are canceled
+
   sdk:
     runs-on: self-hosted
     needs: prepare
@@ -108,4 +116,8 @@ jobs:
         if: ${{ always() }} # Run even if previous steps in the job fail or are canceled
 
       - uses: eviden-actions/clean-self-hosted-runner@v1
+        if: ${{ always() }} # Run even if previous steps in the job fail or are canceled
+
+      - name: remove tmp dir
+        run: rm -rf $TMPDIR
         if: ${{ always() }} # Run even if previous steps in the job fail or are canceled
