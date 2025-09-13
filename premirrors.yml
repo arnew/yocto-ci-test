@@ -7,5 +7,6 @@ local_conf_header:
       PREMIRRORS:prepend = "\
           https?://.*/.*(tar\.gz|tar\.bz2|tar\.xz|zip) http://yocto-cache.m.rasentrimmer.org:8080/downloads/ \
           ftp://.*/.* http://yocto-cache.m.rasentrimmer.org:8080/downloads/ \
+          git://.* http://yocto-cache.m.rasentrimmer.org:8080/downloads/ \
           "
 
