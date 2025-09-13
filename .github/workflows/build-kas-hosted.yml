@@ -132,5 +132,6 @@ jobs:
           files: |
             **/*sdimg
             **/*sh
+        token: ${{ secrets.RELEASE_TOKEN }}
 
 
