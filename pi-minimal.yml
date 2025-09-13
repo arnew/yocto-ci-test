@@ -1,5 +1,7 @@
 header:
     version: 14
+    includes: 
+      - hailo.yml
 distro: poky
 repos:
     poky:

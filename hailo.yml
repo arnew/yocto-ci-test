@@ -1,0 +1,14 @@
+header:
+    version: 14
+repos:
+    meta-hailo:
+        url: https://github.com/arnew/meta-hailo
+        branch: scarthgap
+        layers:
+            meta-hailo-accelerator:
+            meta-hailo-libhailort:
+local_conf_header:
+    meta-hailo:
+        IMAGE_INSTALL:append = " hailo-firmware libhailort"
+        #TOOLCHAIN_TARGET_TASK:append = " libhailort"
+
