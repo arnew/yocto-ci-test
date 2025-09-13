@@ -8,7 +8,8 @@ repos:
             meta-hailo-accelerator:
             meta-hailo-libhailort:
 local_conf_header:
-    meta-hailo:
+    meta-hailo: |
         IMAGE_INSTALL:append = " hailo-firmware libhailort opencv "
-        #TOOLCHAIN_TARGET_TASK:append = " libhailort"
+        TOOLCHAIN_TARGET_TASK += " opencv-staticdev "
+
 
