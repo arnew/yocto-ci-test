@@ -69,7 +69,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: images
-          path: ${{ env.TMPDIR }}/deploy/images/*/*sdimg
+          path: ${{ env.TMPDIR }}/deploy/images/*/*.rootfs.*sdimg
 
       - name: Upload DL_DIR to cache server
         run: rsync -av --ignore-existing "$DL_DIR/" "$DL_DIR_REMOTE/"
@@ -131,7 +131,7 @@ jobs:
         if: github.ref_type == 'tag'
         with:
           files: |
-            **/*sdimg
+            **/*.rootfs.*sdimg
             **/*sh
           token: ${{ secrets.RELEASE_TOKEN }}
 
