@@ -9,7 +9,8 @@ local_conf_header:
     premirrors: |
       BB_GENERATE_MIRROR_TARBALLS="1"
       BB_GIT_SHALLOW="1"
-      PREMIRRORS:prepend = "\
+      BB_FETCH_PREMIRRORONLY="1"
+      PREMIRRORS = "\
           https?://.*/.*(tar\.gz|tar\.bz2|tar\.xz|zip) http://yocto-cache.m.rasentrimmer.org:8080/downloads/ \
           ftp://.*/.* http://yocto-cache.m.rasentrimmer.org:8080/downloads/ \
           git://.* http://yocto-cache.m.rasentrimmer.org:8080/downloads/ \
