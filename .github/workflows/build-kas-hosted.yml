@@ -66,6 +66,29 @@ jobs:
           name: images
           path: ${{ env.TMPDIR }}/deploy/images/*/*sdimg
 
+      - name: Upload DL_DIR to cache server
+        run: rsync -av --ignore-existing "$DL_DIR/" "$DL_DIR_REMOTE/"
+        if: ${{ always() }} # Run even if previous steps in the job fail or are canceled
+
+      - name: Upload SSTATE to cache server
+        run: rsync -av --ignore-existing "$SSTATE_DIR/" "$SSTATE_DIR_REMOTE/"
+        if: ${{ always() }} # Run even if previous steps in the job fail or are canceled
+
+      - uses: eviden-actions/clean-self-hosted-runner@v1
+        if: ${{ always() }} # Run even if previous steps in the job fail or are canceled
+
+  sdk:
+    runs-on: self-hosted
+    needs: prepare
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Kas (pip only)
+        run: pip install --upgrade kas
+
       - name: Build Yocto SDK
         run: kas build pi-minimal.yml:force-premirror.yml -c populate_sdk
 
