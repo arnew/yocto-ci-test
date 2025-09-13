@@ -56,10 +56,10 @@ jobs:
         continue-on-error: true
         run: |
           set -x
-          kas shell -c "bitbake core-image-base --runall=fetch" pi-minimal.yml:premirrors.yml
+          kas shell -c "bitbake core-image-base --runall=fetch" pi-minimal.yml:force-premirror.yml
 
       - name: Build Yocto Project
-        run: kas build pi-minimal.yml
+        run: kas build pi-minimal.yml:force-premirror.yml
 
       - name: Upload image
         uses: actions/upload-artifact@v4
@@ -68,7 +68,7 @@ jobs:
           path: ${{ env.KAS_BUILD_DIR }}/tmp/deploy/images/*/*sdimg
 
       - name: Build Yocto SDK
-        run: kas build pi-minimal.yml -c populate_sdk
+        run: kas build pi-minimal.yml:force-premirror.yml -c populate_sdk
 
       - name: Upload SDK
         uses: actions/upload-artifact@v4

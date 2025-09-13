@@ -5,7 +5,6 @@ local_conf_header:
     premirrors: |
       BB_GENERATE_MIRROR_TARBALLS="1"
       BB_GIT_SHALLOW="1"
-      SOURCE_MIRROR_URL = "http://yocto-cache.m.rasentrimmer.org:8080/downloads/"
       PREMIRRORS:prepend = "\
           https?://.*/.*(tar\.gz|tar\.bz2|tar\.xz|zip) http://yocto-cache.m.rasentrimmer.org:8080/downloads/ \
           ftp://.*/.* http://yocto-cache.m.rasentrimmer.org:8080/downloads/ \
