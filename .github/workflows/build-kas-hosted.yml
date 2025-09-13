@@ -36,12 +36,27 @@ jobs:
         run: |
           set -x
           kas shell -c "bitbake core-image-base --runall=fetch" pi-minimal.yml:premirrors.yml
+
       - name: Upload DL_DIR to cache server
         run: rsync -av --ignore-existing "$DL_DIR/" "$DL_DIR_REMOTE/"
 
   build:
     runs-on: self-hosted
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Kas (pip only)
+        run: pip install --upgrade kas
+
+      - name: Prefetch sources using premirrors
+        continue-on-error: true
+        run: |
+          set -x
+          kas shell -c "bitbake core-image-base --runall=fetch" pi-minimal.yml:premirrors.yml
+
       - name: Build Yocto Project
         run: kas build pi-minimal.yml
 
