@@ -9,7 +9,8 @@ env:
   #BITBAKE_UI: "knotty"             # standard output UI
   #BBDEBUG: "2"                     # bitbake debug level (0–2 usually useful)
 
-  KAS_BUILD_DIR: /build
+  #KAS_BUILD_DIR: /build
+  TMPDIR: /build/tmp
   DL_DIR: /build/downloads
   SSTATE_DIR: /build/sstate-cache
 
@@ -69,7 +70,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: images
-          path: ${{ env.KAS_BUILD_DIR }}/tmp/deploy/images/*/*sdimg
+          path: ${{ env.TMPDIR }}/deploy/images/*/*sdimg
 
       - name: Build Yocto SDK
         run: kas build pi-minimal.yml:force-premirror.yml -c populate_sdk
@@ -78,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: sdk
-          path: ${{ env.KAS_BUILD_DIR }}/tmp/deploy/sdk/*
+          path: ${{ env.TMPDIR }}/deploy/sdk/*
 
       - name: Upload DL_DIR to cache server
         run: rsync -av --ignore-existing "$DL_DIR/" "$DL_DIR_REMOTE/"
