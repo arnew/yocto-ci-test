@@ -39,6 +39,10 @@ jobs:
 
       - name: Upload DL_DIR to cache server
         run: rsync -av --ignore-existing "$DL_DIR/" "$DL_DIR_REMOTE/"
+        if: ${{ always() }} # Run even if previous steps in the job fail or are canceled
+
+      - uses: eviden-actions/clean-self-hosted-runner@v1
+        if: ${{ always() }} # Run even if previous steps in the job fail or are canceled
 
   build:
     runs-on: self-hosted
@@ -78,6 +82,11 @@ jobs:
 
       - name: Upload DL_DIR to cache server
         run: rsync -av --ignore-existing "$DL_DIR/" "$DL_DIR_REMOTE/"
+        if: ${{ always() }} # Run even if previous steps in the job fail or are canceled
 
       - name: Upload SSTATE to cache server
         run: rsync -av --ignore-existing "$SSTATE_DIR/" "$SSTATE_DIR_REMOTE/"
+        if: ${{ always() }} # Run even if previous steps in the job fail or are canceled
+
+      - uses: eviden-actions/clean-self-hosted-runner@v1
+        if: ${{ always() }} # Run even if previous steps in the job fail or are canceled
