@@ -65,11 +65,16 @@ jobs:
       - name: Build Yocto Project
         run: kas build pi-minimal.yml:force-premirror.yml
 
+      - name: Collect and Compress Artifact
+        run: |
+          cp ${{ env.TMPDIR }}/deploy/images/*/*.rootfs.*sdimg .
+          xz *sdimg
+
       - name: Upload image
         uses: actions/upload-artifact@v4
         with:
-          name: images
-          path: ${{ env.TMPDIR }}/deploy/images/*/*.rootfs.*sdimg
+          name: image
+          path: ./*.xz
 
       - name: Upload DL_DIR to cache server
         run: rsync -av --ignore-existing "$DL_DIR/" "$DL_DIR_REMOTE/"
@@ -101,11 +106,16 @@ jobs:
       - name: Build Yocto SDK
         run: kas build pi-minimal.yml:force-premirror.yml -c populate_sdk
 
+      - name: Collect and compress Artifact
+        run: |
+          cp ${{ env.TMPDIR }}/deploy/sdk/* .
+          xz *sh
+
       - name: Upload SDK
         uses: actions/upload-artifact@v4
         with:
           name: sdk
-          path: ${{ env.TMPDIR }}/deploy/sdk/*
+          path: ./poky-*
 
       - name: Upload DL_DIR to cache server
         run: rsync -av --ignore-existing "$DL_DIR/" "$DL_DIR_REMOTE/"
@@ -128,16 +138,12 @@ jobs:
     needs: [build,sdk]
     steps:
       - uses: actions/download-artifact@v5
-      - name: compress
-        run: |
-          xz **/*.rootfs.*sdimg
-          xz **/*sh
       - uses: softprops/action-gh-release@v2
         if: github.ref_type == 'tag'
         with:
           files: |
-            **/*.rootfs.*sdimg.xz
-            **/*sh.xz
+            *xz
+            *spdx*
           token: ${{ secrets.RELEASE_TOKEN }}
 
 
