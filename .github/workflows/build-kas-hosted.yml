@@ -121,18 +121,23 @@ jobs:
       - name: remove tmp dir
         run: rm -rf $TMPDIR
         if: ${{ always() }} # Run even if previous steps in the job fail or are canceled
+
   release:
     if: github.ref_type == 'tag'
     runs-on: self-hosted
     needs: [build,sdk]
     steps:
       - uses: actions/download-artifact@v5
+      - name: compress
+        run: |
+          xz **/*.rootfs.*sdimg
+          xz **/*sh
       - uses: softprops/action-gh-release@v2
         if: github.ref_type == 'tag'
         with:
           files: |
-            **/*.rootfs.*sdimg
-            **/*sh
+            **/*.rootfs.*sdimg.xz
+            **/*sh.xz
           token: ${{ secrets.RELEASE_TOKEN }}
 
 
